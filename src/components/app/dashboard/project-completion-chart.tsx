@@ -1,7 +1,7 @@
 "use client"
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
-
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -9,8 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { projects, tasks } from "@/lib/data"
+import { tasks } from "@/lib/data"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
+import { getProjects } from "@/services/projects";
+import type { Project } from "@/lib/types";
 
 const chartConfig = {
   completion: {
@@ -20,15 +22,25 @@ const chartConfig = {
 };
 
 export default function ProjectCompletionChart() {
-    const data = projects.map(project => {
-        const projectTasks = tasks.filter(task => task.projectId === project.id);
-        const completedTasks = projectTasks.filter(task => task.status === 'Done').length;
-        const completion = projectTasks.length > 0 ? (completedTasks / projectTasks.length) * 100 : 0;
-        return {
-            name: project.name,
-            completion: Math.round(completion),
+    const [data, setData] = useState<any[]>([]);
+
+    useEffect(() => {
+        async function fetchData() {
+            const projects = await getProjects();
+            const chartData = projects.map(project => {
+                const projectTasks = tasks.filter(task => task.projectId === project.id);
+                const completedTasks = projectTasks.filter(task => task.status === 'Done').length;
+                const completion = projectTasks.length > 0 ? (completedTasks / projectTasks.length) * 100 : 0;
+                return {
+                    name: project.name,
+                    completion: Math.round(completion),
+                }
+            });
+            setData(chartData);
         }
-    });
+        fetchData();
+    }, []);
+    
 
   return (
     <ChartContainer config={chartConfig} className="w-full h-full">

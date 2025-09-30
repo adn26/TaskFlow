@@ -9,9 +9,7 @@ export const users: User[] = [
 ];
 
 export const projects: Project[] = [
-  { id: 'proj-1', name: 'Website Redesign', description: 'Complete overhaul of the company website.' },
-  { id: 'proj-2', name: 'Mobile App Launch', description: 'Launch of the new mobile application for iOS and Android.' },
-  { id: 'proj-3', name: 'Q3 Marketing Campaign', description: 'Marketing campaign for the third quarter.' },
+  // This will be fetched from Firestore now
 ];
 
 export const tasks: Task[] = [

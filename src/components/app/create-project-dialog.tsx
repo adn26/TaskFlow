@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { PlusCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { createProject } from "@/services/projects";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -38,6 +40,7 @@ const formSchema = z.object({
 export default function CreateProjectDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,18 +50,31 @@ export default function CreateProjectDialog() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // In a real app, you'd call an API to create the project.
-    // Here we'll just show a toast and close the dialog.
-    console.log(values);
-    
-    toast({
-      title: "Project Created!",
-      description: `The project "${values.name}" has been successfully created.`,
-    });
-    form.reset();
-    setIsOpen(false);
-    // You might want to trigger a re-fetch of projects list here
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      const newProject = await createProject({
+        name: values.name,
+        description: values.description || "",
+      });
+      
+      toast({
+        title: "Project Created!",
+        description: `The project "${values.name}" has been successfully created.`,
+      });
+      
+      form.reset();
+      setIsOpen(false);
+      router.refresh(); // Refresh the page to show the new project in the sidebar
+      router.push(`/projects/${newProject.id}`); // Navigate to the new project's page
+
+    } catch (error) {
+      console.error("Failed to create project:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create the project. Please try again.",
+      });
+    }
   }
 
   return (
@@ -110,7 +126,9 @@ export default function CreateProjectDialog() {
               />
             </div>
             <DialogFooter>
-              <Button type="submit">Create Project</Button>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? "Creating..." : "Create Project"}
+              </Button>
             </DialogFooter>
           </form>
         </Form>

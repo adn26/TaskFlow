@@ -7,6 +7,7 @@ import {
   Package,
   Package2,
   Search,
+  Columns
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -21,10 +22,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import NotificationsPopover from './notifications-popover';
-import { projects } from '@/lib/data';
+import { getProjects } from '@/services/projects';
 import CreateProjectDialog from './create-project-dialog';
 
-export default function AppHeader() {
+export default async function AppHeader() {
+  const projects = await getProjects();
+
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
       <Sheet>
@@ -58,7 +61,16 @@ export default function AppHeader() {
               <h3 className="text-sm font-semibold text-muted-foreground uppercase">Projects</h3>
               <CreateProjectDialog />
             </div>
-             {/* Project Links will be dynamically rendered here */}
+            {projects.map(project => (
+                <Link
+                key={project.id}
+                href={`/projects/${project.id}`}
+                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                <Columns className="h-4 w-4" />
+                {project.name}
+                </Link>
+            ))}
           </nav>
         </SheetContent>
       </Sheet>

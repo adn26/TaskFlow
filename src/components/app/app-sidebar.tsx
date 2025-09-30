@@ -4,8 +4,11 @@ import { Bell, Columns, Home, Package, Package2, PlusCircle, Users } from 'lucid
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import CreateProjectDialog from './create-project-dialog';
+import { getProjects } from '@/services/projects';
 
-export default function AppSidebar() {
+export default async function AppSidebar() {
+  const projects = await getProjects();
+
   return (
     <div className="hidden border-r bg-muted/40 md:block">
       <div className="flex h-full max-h-screen flex-col gap-2">
@@ -32,7 +35,16 @@ export default function AppSidebar() {
               <h3 className="text-xs font-semibold text-muted-foreground uppercase">Projects</h3>
               <CreateProjectDialog />
             </div>
-            {/* Project Links will be dynamically rendered here */}
+            {projects.map(project => (
+              <Link
+                key={project.id}
+                href={`/projects/${project.id}`}
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <Columns className="h-4 w-4" />
+                {project.name}
+              </Link>
+            ))}
           </nav>
         </div>
         <div className="mt-auto p-4">

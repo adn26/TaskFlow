@@ -21,17 +21,22 @@ import {
 import ProjectCompletionChart from "@/components/app/dashboard/project-completion-chart";
 import TasksPerStatusChart from "@/components/app/dashboard/tasks-per-status-chart";
 import UpcomingDeadlines from "@/components/app/dashboard/upcoming-deadlines";
-import { tasks, projects } from "@/lib/data";
+import { tasks } from "@/lib/data";
+import { getProjects } from "@/services/projects";
 
 export const metadata: Metadata = {
   title: "Dashboard | TaskFlow",
   description: "Your project overview.",
 };
 
-export default function DashboardPage() {
+// This tells Next.js to not statically generate this page at build time
+export const dynamic = 'force-dynamic';
+
+export default async function DashboardPage() {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.status === 'Done').length;
     const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    const projects = await getProjects();
 
 
   return (
