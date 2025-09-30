@@ -25,15 +25,25 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { createTask } from "@/services/tasks";
 import type { TaskStatus } from "@/lib/types";
+import { users } from "@/lib/data";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const formSchema = z.object({
   title: z.string().min(2, {
     message: "Task title must be at least 2 characters.",
   }),
   description: z.string().optional(),
+  assigneeId: z.string().optional(),
 });
 
 type CreateTaskDialogProps = {
@@ -52,6 +62,7 @@ export default function CreateTaskDialog({ status, projectId, onTaskCreated, tri
     defaultValues: {
       title: "",
       description: "",
+      assigneeId: undefined,
     },
   });
 
@@ -62,6 +73,7 @@ export default function CreateTaskDialog({ status, projectId, onTaskCreated, tri
         status,
         title: values.title,
         description: values.description || "",
+        assigneeId: values.assigneeId,
       });
       
       toast({
@@ -123,6 +135,36 @@ export default function CreateTaskDialog({ status, projectId, onTaskCreated, tri
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="assigneeId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Assign To (Optional)</FormLabel>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a user" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {users.map(user => (
+                            <SelectItem key={user.id} value={user.id}>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-6 w-6">
+                                  <AvatarImage src={user.avatarUrl} alt={user.name} />
+                                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                                <span>{user.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     <FormMessage />
                   </FormItem>
                 )}
