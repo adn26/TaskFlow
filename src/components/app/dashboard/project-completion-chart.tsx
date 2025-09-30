@@ -10,7 +10,14 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { projects, tasks } from "@/lib/data"
-import { ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
+
+const chartConfig = {
+  completion: {
+    label: "Completion",
+    color: "hsl(var(--primary))",
+  },
+};
 
 export default function ProjectCompletionChart() {
     const data = projects.map(project => {
@@ -24,25 +31,27 @@ export default function ProjectCompletionChart() {
     });
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data}>
-        <XAxis
-          dataKey="name"
-          stroke="hsl(var(--muted-foreground))"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-        />
-        <YAxis
-          stroke="hsl(var(--muted-foreground))"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-          tickFormatter={(value) => `${value}%`}
-        />
-        <Tooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent />} />
-        <Bar dataKey="completion" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
+    <ChartContainer config={chartConfig} className="w-full h-full">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data} accessibilityLayer>
+          <XAxis
+            dataKey="name"
+            stroke="hsl(var(--muted-foreground))"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            stroke="hsl(var(--muted-foreground))"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => `${value}%`}
+          />
+          <Tooltip cursor={{fill: 'hsl(var(--muted))'}} content={<ChartTooltipContent indicator="dot" />} />
+          <Bar dataKey="completion" fill="var(--color-completion)" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartContainer>
   )
 }
