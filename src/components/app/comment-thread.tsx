@@ -6,6 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { users } from "@/lib/data";
 import { getCommentsForTask, addComment } from "@/services/comments";
 import type { Comment } from "@/lib/types";
+import { Reply } from "lucide-react";
 
 type CommentThreadProps = {
   taskId: string;
@@ -14,6 +15,8 @@ type CommentThreadProps = {
 export default function CommentThread({ taskId }: CommentThreadProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState("");
   
   // For demonstration, let's assume the current user is the first user in the list
   const currentUser = users[0];
@@ -27,22 +30,30 @@ export default function CommentThread({ taskId }: CommentThreadProps) {
     fetchComments();
   }, [taskId]);
 
-  const handleAddComment = async () => {
-    if (!newComment.trim()) return;
+  const handleAddComment = async (content: string, parentId?: string) => {
+    if (!content.trim()) return;
 
     await addComment({
       taskId,
       userId: currentUser.id,
-      content: newComment,
+      content,
+      parentId,
       createdAt: new Date(),
     });
 
-    setNewComment("");
+    // Reset inputs and state
+    if (parentId) {
+      setReplyingTo(null);
+      setReplyContent("");
+    } else {
+      setNewComment("");
+    }
+    
     fetchComments(); // Refresh comments list
   };
 
   const topLevelComments = comments.filter(c => !c.parentId);
-  const replies = comments.filter(c => c.parentId);
+  const getReplies = (commentId: string) => comments.filter(c => c.parentId === commentId);
 
   return (
     <div className="space-y-6">
@@ -59,14 +70,14 @@ export default function CommentThread({ taskId }: CommentThreadProps) {
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                 />
-                <Button onClick={handleAddComment}>Comment</Button>
+                <Button onClick={() => handleAddComment(newComment)}>Comment</Button>
             </div>
         </div>
       </div>
       <div className="space-y-4">
         {topLevelComments.map(comment => {
           const user = users.find(u => u.id === comment.userId);
-          const commentReplies = replies.filter(r => r.parentId === comment.id);
+          const commentReplies = getReplies(comment.id);
           return (
             <div key={comment.id} className="flex gap-4">
               <Avatar>
@@ -81,6 +92,35 @@ export default function CommentThread({ taskId }: CommentThreadProps) {
                   </span>
                 </div>
                 <p className="text-sm">{comment.content}</p>
+                <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="mt-1 -ml-2"
+                    onClick={() => { setReplyingTo(replyingTo === comment.id ? null : comment.id); setReplyContent(""); }}
+                >
+                    <Reply className="mr-2 h-4 w-4" />
+                    Reply
+                </Button>
+                
+                 {replyingTo === comment.id && (
+                    <div className="flex gap-4 mt-2">
+                        <Avatar className="h-8 w-8">
+                            <AvatarImage src={currentUser?.avatarUrl} />
+                            <AvatarFallback>{currentUser?.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        <div className="w-full space-y-2">
+                            <Textarea 
+                                placeholder={`Replying to ${user?.name}...`}
+                                value={replyContent}
+                                onChange={(e) => setReplyContent(e.target.value)}
+                            />
+                            <div className="flex gap-2">
+                                <Button onClick={() => handleAddComment(replyContent, comment.id)}>Post Reply</Button>
+                                <Button variant="ghost" onClick={() => setReplyingTo(null)}>Cancel</Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 
                 {commentReplies.length > 0 && (
                     <div className="mt-4 space-y-4">

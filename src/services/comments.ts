@@ -9,11 +9,17 @@ const getCommentsFromStorage = (): Comment[] => {
   }
   const commentsJson = localStorage.getItem('comments');
   if (commentsJson) {
-    return JSON.parse(commentsJson);
+    try {
+        const parsed = JSON.parse(commentsJson);
+        // Ensure createdAt is a Date object
+        return parsed.map((c: any) => ({...c, createdAt: new Date(c.createdAt)}));
+    } catch (e) {
+        console.error("Failed to parse comments from localStorage", e);
+        return [];
+    }
   } else {
     // Initialize with mock data if nothing is in storage
-    const commentsWithDateStrings = initialComments.map(c => ({...c, createdAt: c.createdAt.toISOString() }));
-    localStorage.setItem('comments', JSON.stringify(commentsWithDateStrings));
+    localStorage.setItem('comments', JSON.stringify(initialComments));
     return initialComments;
   }
 };
@@ -23,7 +29,9 @@ const saveCommentsToStorage = (comments: Comment[]) => {
   if (typeof window === 'undefined') {
     return;
   }
-  localStorage.setItem('comments', JSON.stringify(comments));
+  // Convert Date objects to ISO strings before saving
+  const commentsWithStringDates = comments.map(c => ({...c, createdAt: c.createdAt.toISOString()}));
+  localStorage.setItem('comments', JSON.stringify(commentsWithStringDates));
 };
 
 export async function addComment(comment: Omit<Comment, 'id'>): Promise<Comment> {
@@ -43,9 +51,5 @@ export async function getCommentsForTask(taskId: string): Promise<Comment[]> {
     const comments = getCommentsFromStorage();
     return comments
         .filter(comment => comment.taskId === taskId)
-        .map(comment => ({
-            ...comment,
-            createdAt: new Date(comment.createdAt)
-        }))
         .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
