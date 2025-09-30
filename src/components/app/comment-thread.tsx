@@ -5,20 +5,114 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from "date-fns";
 import { users } from "@/lib/data";
 import { getCommentsForTask, addComment } from "@/services/comments";
-import type { Comment } from "@/lib/types";
+import type { Comment as CommentType } from "@/lib/types";
 import { Reply } from "lucide-react";
 
 type CommentThreadProps = {
   taskId: string;
 };
 
-export default function CommentThread({ taskId }: CommentThreadProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState("");
+type CommentItemProps = {
+  comment: CommentType;
+  allComments: CommentType[];
+  onReplySubmit: (content: string, parentId: string) => void;
+  currentUser: (typeof users)[0];
+};
+
+function CommentItem({ comment, allComments, onReplySubmit, currentUser }: CommentItemProps) {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
+
+  const user = users.find((u) => u.id === comment.userId);
+  const replies = allComments.filter((c) => c.parentId === comment.id);
+
+  const handleReply = () => {
+    if (replyContent.trim()) {
+      onReplySubmit(replyContent, comment.id);
+      setReplyContent("");
+      setReplyingTo(null);
+    }
+  };
+
+  return (
+    <div className="flex gap-4">
+      <Avatar className="h-9 w-9">
+        <AvatarImage src={user?.avatarUrl} />
+        <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+      </Avatar>
+      <div className="flex-1">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold">{user?.name}</span>
+          <span className="text-xs text-muted-foreground">
+            {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+          </span>
+        </div>
+        <p className="text-sm">{comment.content}</p>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="mt-1 -ml-2 h-auto px-2 py-1 text-xs"
+          onClick={() => {
+            setReplyingTo(replyingTo === comment.id ? null : comment.id);
+            setReplyContent("");
+          }}
+        >
+          <Reply className="mr-1 h-3 w-3" />
+          Reply
+        </Button>
+
+        {replyingTo === comment.id && (
+          <div className="flex gap-4 mt-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={currentUser?.avatarUrl} />
+              <AvatarFallback>{currentUser?.name.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="w-full space-y-2">
+              <Textarea
+                placeholder={`Replying to ${user?.name}...`}
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                className="min-h-[60px]"
+              />
+              <div className="flex gap-2">
+                <Button size="sm" onClick={handleReply}>
+                  Post Reply
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setReplyingTo(null)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {replies.length > 0 && (
+          <div className="mt-4 space-y-4 border-l-2 border-muted pl-4">
+            {replies.map((reply) => (
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                allComments={allComments}
+                onReplySubmit={onReplySubmit}
+                currentUser={currentUser}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+export default function CommentThread({ taskId }: CommentThreadProps) {
+  const [comments, setComments] = useState<CommentType[]>([]);
+  const [newComment, setNewComment] = useState("");
   
-  // For demonstration, let's assume the current user is the first user in the list
   const currentUser = users[0];
 
   const fetchComments = async () => {
@@ -28,6 +122,10 @@ export default function CommentThread({ taskId }: CommentThreadProps) {
 
   useEffect(() => {
     fetchComments();
+    
+    window.addEventListener('storage', fetchComments);
+    return () => window.removeEventListener('storage', fetchComments);
+
   }, [taskId]);
 
   const handleAddComment = async (content: string, parentId?: string) => {
@@ -41,19 +139,14 @@ export default function CommentThread({ taskId }: CommentThreadProps) {
       createdAt: new Date(),
     });
 
-    // Reset inputs and state
-    if (parentId) {
-      setReplyingTo(null);
-      setReplyContent("");
-    } else {
+    if (!parentId) {
       setNewComment("");
     }
     
-    fetchComments(); // Refresh comments list
+    fetchComments();
   };
 
   const topLevelComments = comments.filter(c => !c.parentId);
-  const getReplies = (commentId: string) => comments.filter(c => c.parentId === commentId);
 
   return (
     <div className="space-y-6">
@@ -75,81 +168,15 @@ export default function CommentThread({ taskId }: CommentThreadProps) {
         </div>
       </div>
       <div className="space-y-4">
-        {topLevelComments.map(comment => {
-          const user = users.find(u => u.id === comment.userId);
-          const commentReplies = getReplies(comment.id);
-          return (
-            <div key={comment.id} className="flex gap-4">
-              <Avatar>
-                <AvatarImage src={user?.avatarUrl} />
-                <AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold">{user?.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
-                  </span>
-                </div>
-                <p className="text-sm">{comment.content}</p>
-                <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="mt-1 -ml-2"
-                    onClick={() => { setReplyingTo(replyingTo === comment.id ? null : comment.id); setReplyContent(""); }}
-                >
-                    <Reply className="mr-2 h-4 w-4" />
-                    Reply
-                </Button>
-                
-                 {replyingTo === comment.id && (
-                    <div className="flex gap-4 mt-2">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={currentUser?.avatarUrl} />
-                            <AvatarFallback>{currentUser?.name.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div className="w-full space-y-2">
-                            <Textarea 
-                                placeholder={`Replying to ${user?.name}...`}
-                                value={replyContent}
-                                onChange={(e) => setReplyContent(e.target.value)}
-                            />
-                            <div className="flex gap-2">
-                                <Button onClick={() => handleAddComment(replyContent, comment.id)}>Post Reply</Button>
-                                <Button variant="ghost" onClick={() => setReplyingTo(null)}>Cancel</Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
-                
-                {commentReplies.length > 0 && (
-                    <div className="mt-4 space-y-4">
-                        {commentReplies.map(reply => {
-                            const replyUser = users.find(u => u.id === reply.userId);
-                            return (
-                                <div key={reply.id} className="flex gap-4">
-                                    <Avatar className="h-8 w-8">
-                                        <AvatarImage src={replyUser?.avatarUrl} />
-                                        <AvatarFallback>{replyUser?.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1">
-                                        <div className="flex items-center gap-2">
-                                        <span className="font-semibold">{replyUser?.name}</span>
-                                        <span className="text-xs text-muted-foreground">
-                                            {formatDistanceToNow(new Date(reply.createdAt), { addSuffix: true })}
-                                        </span>
-                                        </div>
-                                        <p className="text-sm">{reply.content}</p>
-                                    </div>
-                                </div>
-                            )
-                        })}
-                    </div>
-                )}
-              </div>
-            </div>
-          );
-        })}
+        {topLevelComments.map(comment => (
+            <CommentItem 
+                key={comment.id}
+                comment={comment}
+                allComments={comments}
+                onReplySubmit={handleAddComment}
+                currentUser={currentUser}
+            />
+        ))}
          {topLevelComments.length === 0 && (
           <div className="text-center text-muted-foreground py-4">
             No comments yet. Start the conversation!
