@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "login-bg",
+      "description": "Abstract workspace background for login page",
+      "imageUrl": "https://images.unsplash.com/photo-1745238745177-929da33bb07b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMHdvcmtzcGFjZXxlbnwwfHx8fDE3NTkxNDEwMzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract workspace"
+    },
+    {
+      "id": "user-1",
+      "description": "Avatar for Olivia Martin",
+      "imageUrl": "https://images.unsplash.com/photo-1593351799227-75df2026356b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHx3b21hbiUyMHBvcnRyYWl0fGVufDB8fHx8MTc1OTE3MTY1OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "user-2",
+      "description": "Avatar for Jackson Lee",
+      "imageUrl": "https://images.unsplash.com/photo-1715029005043-e88d219a3c48?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWFuJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzU5MTcxOTc1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "user-3",
+      "description": "Avatar for Isabella Nguyen",
+      "imageUrl": "https://images.unsplash.com/photo-1580489944761-15a19d654956?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3b21hbiUyMHNtaWxpbmd8ZW58MHx8fHwxNzU5MTA5ODM0fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman smiling"
+    },
+    {
+      "id": "user-4",
+      "description": "Avatar for William Kim",
+      "imageUrl": "https://images.unsplash.com/photo-1708458662177-8e12e1b6702d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8bWFuJTIwcHJvZmVzc2lvbmFsfGVufDB8fHx8MTc1OTE5NzQ2N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man professional"
+    },
+    {
+      "id": "user-5",
+      "description": "Avatar for Sophia Gonzalez",
+      "imageUrl": "https://images.unsplash.com/photo-1565946590329-fc70903f0ba0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx3b21hbiUyMHNvZnR3YXJlfGVufDB8fHx8MTc1OTIzMjM2OHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "woman software"
+    },
+    {
+      "id": "task-attachment-1",
+      "description": "Design mockup for a task attachment",
+      "imageUrl": "https://images.unsplash.com/photo-1548849929-a63fe18c9ee4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxkZXNpZ24lMjBtb2NrdXB8ZW58MHx8fHwxNzU5MTM5NzI4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "design mockup"
+    },
+    {
+      "id": "task-attachment-2",
+      "description": "User flow diagram for a task attachment",
+      "imageUrl": "https://images.unsplash.com/photo-1646617747561-9b91464e780a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxmbG93JTIwZGlhZ3JhbXxlbnwwfHx8fDE3NTkyMjYwNjh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "flow diagram"
+    }
+  ]
 }
