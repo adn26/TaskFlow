@@ -4,6 +4,7 @@ import {
   CircleUser,
   Home,
   Menu,
+  Package,
   Package2,
   Search,
 } from 'lucide-react';
