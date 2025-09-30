@@ -28,9 +28,6 @@ import { getProjects } from "@/services/projects";
 import { useEffect, useState } from "react";
 import type { Project } from "@/lib/types";
 
-// This tells Next.js to not statically generate this page at build time
-// export const dynamic = 'force-dynamic';
-
 export default function DashboardPage() {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.status === 'Done').length;

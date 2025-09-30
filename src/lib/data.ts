@@ -9,7 +9,7 @@ export const users: User[] = [
 ];
 
 export const projects: Project[] = [
-  // This will be fetched from Firestore now
+  // This is now managed in localStorage by src/services/projects.ts
 ];
 
 export const tasks: Task[] = [
