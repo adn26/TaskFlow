@@ -23,6 +23,3 @@ npm install
 npm run dev
 ```
 
-## Upgrade to Pro
-
-Unlock all features and get unlimited access to our support team by upgrading to our Pro plan. Click the "Upgrade" button in the app to learn more.
