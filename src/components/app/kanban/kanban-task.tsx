@@ -1,14 +1,14 @@
 "use client";
 
 import type { Task } from '@/lib/types';
-import { users } from '@/lib/data';
+import { users, comments } from '@/lib/data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, differenceInDays } from 'date-fns';
 import { Calendar, MessageSquare, Paperclip } from 'lucide-react';
 import TaskDetailsDialog from '../task-details-dialog';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 type KanbanTaskProps = {
   task: Task;
@@ -19,6 +19,11 @@ export default function KanbanTask({ task, onDragStart }: KanbanTaskProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const assignee = users.find(user => user.id === task.assigneeId);
   const dueDate = task.dueDate;
+  
+  const commentCount = useMemo(() => {
+    return comments.filter(c => c.taskId === task.id).length;
+  }, [task.id]);
+
   let dueDateColor = "text-muted-foreground";
   if (dueDate) {
     const daysLeft = differenceInDays(dueDate, new Date());
@@ -57,10 +62,12 @@ export default function KanbanTask({ task, onDragStart }: KanbanTaskProps) {
                             <span>{format(dueDate, "MMM d")}</span>
                         </div>
                     )}
-                    <div className="flex items-center gap-1">
-                        <MessageSquare className="h-4 w-4" />
-                        <span>3</span>
-                    </div>
+                    {commentCount > 0 && (
+                      <div className="flex items-center gap-1">
+                          <MessageSquare className="h-4 w-4" />
+                          <span>{commentCount}</span>
+                      </div>
+                    )}
                      <div className="flex items-center gap-1">
                         <Paperclip className="h-4 w-4" />
                         <span>2</span>
