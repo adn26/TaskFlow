@@ -1,13 +1,33 @@
+"use client";
+
 import Link from 'next/link';
-import { Bell, Columns, Home, Package, Package2, PlusCircle, Users } from 'lucide-react';
+import { Bell, Columns, Home, Package2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import CreateProjectDialog from './create-project-dialog';
 import { getProjects } from '@/services/projects';
+import type { Project } from '@/lib/types';
 
-export default async function AppSidebar() {
-  const projects = await getProjects();
+export default function AppSidebar() {
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const fetchedProjects = await getProjects();
+      setProjects(fetchedProjects);
+    };
+    fetchProjects();
+
+    // Also listen for storage changes to update the sidebar
+    const handleStorageChange = () => {
+        fetchProjects();
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+
+  }, []);
 
   return (
     <div className="hidden border-r bg-muted/40 md:block">

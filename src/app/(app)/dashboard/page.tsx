@@ -1,3 +1,5 @@
+"use client";
+
 import type { Metadata } from "next";
 import { Activity, ArrowUpRight, CreditCard, DollarSign, Users } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -23,20 +25,25 @@ import TasksPerStatusChart from "@/components/app/dashboard/tasks-per-status-cha
 import UpcomingDeadlines from "@/components/app/dashboard/upcoming-deadlines";
 import { tasks } from "@/lib/data";
 import { getProjects } from "@/services/projects";
-
-export const metadata: Metadata = {
-  title: "Dashboard | TaskFlow",
-  description: "Your project overview.",
-};
+import { useEffect, useState } from "react";
+import type { Project } from "@/lib/types";
 
 // This tells Next.js to not statically generate this page at build time
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.status === 'Done').length;
     const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-    const projects = await getProjects();
+    const [projects, setProjects] = useState<Project[]>([]);
+
+    useEffect(() => {
+      async function fetchProjects() {
+        const projs = await getProjects();
+        setProjects(projs);
+      }
+      fetchProjects();
+    }, []);
 
 
   return (

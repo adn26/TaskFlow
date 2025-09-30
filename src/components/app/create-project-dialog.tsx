@@ -64,8 +64,11 @@ export default function CreateProjectDialog() {
       
       form.reset();
       setIsOpen(false);
-      router.refresh(); // Refresh the page to show the new project in the sidebar
-      router.push(`/projects/${newProject.id}`); // Navigate to the new project's page
+      
+      // Manually trigger a storage event to notify other components like the sidebar
+      window.dispatchEvent(new Event('storage'));
+
+      router.push(`/projects/${newProject.id}`);
 
     } catch (error) {
       console.error("Failed to create project:", error);

@@ -1,14 +1,16 @@
+"use client";
+
 import Link from 'next/link';
 import {
   Bell,
   CircleUser,
   Home,
   Menu,
-  Package,
   Package2,
   Search,
   Columns
 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -24,9 +26,25 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import NotificationsPopover from './notifications-popover';
 import { getProjects } from '@/services/projects';
 import CreateProjectDialog from './create-project-dialog';
+import type { Project } from '@/lib/types';
 
-export default async function AppHeader() {
-  const projects = await getProjects();
+
+export default function AppHeader() {
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      const fetchedProjects = await getProjects();
+      setProjects(fetchedProjects);
+    };
+    fetchProjects();
+
+    const handleStorageChange = () => {
+        fetchProjects();
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
