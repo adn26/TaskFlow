@@ -37,8 +37,9 @@ export default function NotificationsPopover() {
       setNotifications(response.prioritizedNotifications);
     } catch (err) {
       console.error(err);
-      setError('Failed to prioritize notifications.');
-      setNotifications([]);
+      setError('AI prioritization failed. Showing default notifications.');
+      // Fallback to showing the original notifications
+      setNotifications(mockNotifications);
     } finally {
       setIsLoading(false);
     }
@@ -83,6 +84,12 @@ export default function NotificationsPopover() {
               Important updates, sorted for you by AI.
             </p>
           </div>
+          {error && (
+             <Alert variant="destructive" className="text-xs">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           <div className="grid gap-2">
             {isLoading ? (
               Array.from({ length: 3 }).map((_, i) => (
@@ -94,12 +101,6 @@ export default function NotificationsPopover() {
                     </div>
                 </div>
               ))
-            ) : error ? (
-                <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
             ) : notifications.length > 0 ? (
               notifications.map((notification, index) => (
                 <div
