@@ -1,34 +1,37 @@
 "use client";
 
 import KanbanBoard from "@/components/app/kanban/kanban-board";
-import { getProject, getProjects } from "@/services/projects";
+import { getProject } from "@/services/projects";
 import { tasks as allTasks } from "@/lib/data";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Project } from "@/lib/types";
 
-export default function ProjectPage({ params }: { params: { projectId: string } }) {
+export default function ProjectPage() {
+    const params = useParams<{ projectId: string }>();
+    const projectId = params.projectId;
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchProject() {
+            if (!projectId) return;
             setLoading(true);
-            const p = await getProject(params.projectId);
+            const p = await getProject(projectId);
             setProject(p);
             setLoading(false);
         }
         fetchProject();
-    }, [params.projectId]);
+    }, [projectId]);
 
-    const tasks = allTasks.filter(t => t.projectId === params.projectId);
+    const tasks = allTasks.filter(t => t.projectId === projectId);
 
     if (loading) {
         return <div>Loading project...</div>;
     }
 
     if (!project) {
-        notFound();
+        return notFound();
     }
 
     return (
