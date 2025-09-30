@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format } from "date-fns";
 import CommentThread from "./comment-thread";
 import FileAttachments from "./file-attachments";
+import { ScrollArea } from "../ui/scroll-area";
 
 type TaskDetailsDialogProps = {
   task: Task;
@@ -74,7 +75,9 @@ export default function TaskDetailsDialog({ task, open, onOpenChange }: TaskDeta
             </div>
           </TabsContent>
           <TabsContent value="comments">
-            <CommentThread taskId={task.id} />
+             <ScrollArea className="h-[400px] pr-4">
+                <CommentThread taskId={task.id} />
+            </ScrollArea>
           </TabsContent>
           <TabsContent value="attachments">
             <FileAttachments taskId={task.id} />
