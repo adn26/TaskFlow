@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import NotificationsPopover from './notifications-popover';
 import { projects } from '@/lib/data';
+import CreateProjectDialog from './create-project-dialog';
 
 export default function AppHeader() {
   return (
@@ -53,17 +54,11 @@ export default function AppHeader() {
               <Home className="h-5 w-5" />
               Dashboard
             </Link>
-            <h3 className="my-2 px-3 text-sm font-semibold text-muted-foreground uppercase">Projects</h3>
-             {projects.map((project) => (
-                <Link
-                key={project.id}
-                href={`/projects/${project.id}`}
-                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                <Package className="h-4 w-4" />
-                {project.name}
-                </Link>
-            ))}
+            <div className="flex items-center justify-between my-2 px-3">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase">Projects</h3>
+              <CreateProjectDialog />
+            </div>
+             {/* Project Links will be dynamically rendered here */}
           </nav>
         </SheetContent>
       </Sheet>
