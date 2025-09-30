@@ -1,14 +1,15 @@
 "use client";
 
 import type { Task } from '@/lib/types';
-import { users, comments } from '@/lib/data';
+import { users } from '@/lib/data';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, differenceInDays } from 'date-fns';
 import { Calendar, MessageSquare, Paperclip } from 'lucide-react';
 import TaskDetailsDialog from '../task-details-dialog';
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { getCommentsForTask } from '@/services/comments';
 
 type KanbanTaskProps = {
   task: Task;
@@ -17,12 +18,27 @@ type KanbanTaskProps = {
 
 export default function KanbanTask({ task, onDragStart }: KanbanTaskProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
   const assignee = users.find(user => user.id === task.assigneeId);
   const dueDate = task.dueDate;
-  
-  const commentCount = useMemo(() => {
-    return comments.filter(c => c.taskId === task.id).length;
+
+  useEffect(() => {
+    async function fetchCommentCount() {
+      if (task.id) {
+        const comments = await getCommentsForTask(task.id);
+        setCommentCount(comments.length);
+      }
+    }
+    fetchCommentCount();
+    
+    const handleStorageChange = () => {
+        fetchCommentCount();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, [task.id]);
+  
 
   let dueDateColor = "text-muted-foreground";
   if (dueDate) {

@@ -30,10 +30,14 @@ export const initialTasks: Task[] = [
   { id: 'task-10', projectId: 'proj-3', title: 'Draft email newsletter', description: 'Write the announcement email for the campaign.', status: 'To Do', assigneeId: 'user-5', dueDate: new Date('2024-09-05T23:59:59'), tags: ['content', 'email'] },
 ];
 
-export const comments: Comment[] = [
+export const initialComments: Comment[] = [
   { id: 'comment-1', taskId: 'task-2', userId: 'user-2', content: 'Looking good! Just a small suggestion: can we make the primary CTA button a bit larger?', createdAt: new Date('2024-08-20T10:00:00') },
   { id: 'comment-2', taskId: 'task-2', userId: 'user-4', content: 'Good point! I\'ll adjust it now.', parentId: 'comment-1', createdAt: new Date('2024-08-20T10:05:00') },
   { id: 'comment-3', taskId: 'task-2', userId: 'user-1', content: 'What\'s the progress on this?', createdAt: new Date('2024-08-21T14:00:00') },
+  { id: 'comment-4', taskId: 'task-3', userId: 'user-1', content: 'I\'ve reviewed the auth flow. It seems solid. Let\'s proceed with the integration.', createdAt: new Date('2024-08-22T11:00:00')},
+  { id: 'comment-5', taskId: 'task-3', userId: 'user-4', content: 'Great, thanks for the review. I\'ll merge it into the main branch.', parentId: 'comment-4', createdAt: new Date('2024-08-22T11:30:00')},
+  { id: 'comment-6', taskId: 'task-3', userId: 'user-2', content: 'Make sure to add logging around the authentication steps for easier debugging later.', parentId: 'comment-4', createdAt: new Date('2024-08-22T12:00:00')},
+  
 ];
 
 export const notifications: Omit<Notification, 'id' | 'read'>[] = [

@@ -1,19 +1,48 @@
-import { comments as allComments, users } from "@/lib/data";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDistanceToNow } from "date-fns";
+import { users } from "@/lib/data";
+import { getCommentsForTask, addComment } from "@/services/comments";
+import type { Comment } from "@/lib/types";
 
 type CommentThreadProps = {
   taskId: string;
 };
 
 export default function CommentThread({ taskId }: CommentThreadProps) {
-  const taskComments = allComments.filter(c => c.taskId === taskId && !c.parentId);
-  const replies = allComments.filter(c => c.taskId === taskId && c.parentId);
-
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  
   // For demonstration, let's assume the current user is the first user in the list
   const currentUser = users[0];
+
+  const fetchComments = async () => {
+    const taskComments = await getCommentsForTask(taskId);
+    setComments(taskComments);
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, [taskId]);
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
+
+    await addComment({
+      taskId,
+      userId: currentUser.id,
+      content: newComment,
+      createdAt: new Date(),
+    });
+
+    setNewComment("");
+    fetchComments(); // Refresh comments list
+  };
+
+  const topLevelComments = comments.filter(c => !c.parentId);
+  const replies = comments.filter(c => c.parentId);
 
   return (
     <div className="space-y-6">
@@ -25,13 +54,17 @@ export default function CommentThread({ taskId }: CommentThreadProps) {
                 <AvatarFallback>{currentUser?.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="w-full space-y-2">
-                <Textarea placeholder="Add a comment..." />
-                <Button>Comment</Button>
+                <Textarea 
+                  placeholder="Add a comment..." 
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                />
+                <Button onClick={handleAddComment}>Comment</Button>
             </div>
         </div>
       </div>
       <div className="space-y-4">
-        {taskComments.map(comment => {
+        {topLevelComments.map(comment => {
           const user = users.find(u => u.id === comment.userId);
           const commentReplies = replies.filter(r => r.parentId === comment.id);
           return (
@@ -77,7 +110,7 @@ export default function CommentThread({ taskId }: CommentThreadProps) {
             </div>
           );
         })}
-         {taskComments.length === 0 && (
+         {topLevelComments.length === 0 && (
           <div className="text-center text-muted-foreground py-4">
             No comments yet. Start the conversation!
           </div>
