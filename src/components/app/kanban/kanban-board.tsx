@@ -6,18 +6,21 @@ import { taskStatuses } from '@/lib/data';
 import KanbanColumn from './kanban-column';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
+import { updateTask } from '@/services/tasks';
 
 type KanbanBoardProps = {
   tasks: Task[];
+  onTaskCreated: () => void;
+  projectId: string;
 };
 
-export default function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
+export default function KanbanBoard({ tasks: initialTasks, onTaskCreated, projectId }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   useEffect(() => {
     // This hook is used to avoid hydration mismatch issues by ensuring
     // that the tasks state is only set on the client-side.
-    setTasks(initialTasks);
+    setTasks(initialTasks.map(t => ({...t, dueDate: t.dueDate ? new Date(t.dueDate) : undefined})));
   }, [initialTasks]);
 
 
@@ -25,13 +28,19 @@ export default function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
     e.dataTransfer.setData('taskId', taskId);
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, newStatus: TaskStatus) => {
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, newStatus: TaskStatus) => {
     const taskId = e.dataTransfer.getData('taskId');
-    setTasks(prevTasks =>
-      prevTasks.map(task =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
+    const taskToUpdate = tasks.find(task => task.id === taskId);
+
+    if (taskToUpdate && taskToUpdate.status !== newStatus) {
+        const updatedTask = { ...taskToUpdate, status: newStatus };
+        await updateTask(updatedTask);
+        setTasks(prevTasks =>
+            prevTasks.map(task =>
+              task.id === taskId ? updatedTask : task
+            )
+        );
+    }
   };
 
   return (
@@ -43,6 +52,8 @@ export default function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
           tasks={tasks.filter(task => task.status === status)}
           onDrop={handleDrop}
           onDragStart={handleDragStart}
+          onTaskCreated={onTaskCreated}
+          projectId={projectId}
         />
       ))}
       <div className="w-80 flex-shrink-0">

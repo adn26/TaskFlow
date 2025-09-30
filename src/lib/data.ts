@@ -12,7 +12,7 @@ export const projects: Project[] = [
   // This is now managed in localStorage by src/services/projects.ts
 ];
 
-export const tasks: Task[] = [
+export const initialTasks: Task[] = [
   // Project 1
   { id: 'task-1', projectId: 'proj-1', title: 'Design new homepage mockups', description: 'Create high-fidelity mockups in Figma.', status: 'Done', assigneeId: 'user-3', dueDate: new Date('2024-08-15T23:59:59'), tags: ['design', 'UI'] },
   { id: 'task-2', projectId: 'proj-1', title: 'Develop front-end for homepage', description: 'Implement the new design using React and Tailwind CSS.', status: 'In Progress', assigneeId: 'user-4', dueDate: new Date('2024-08-25T23:59:59'), tags: ['development', 'frontend'] },

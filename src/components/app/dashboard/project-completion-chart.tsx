@@ -9,10 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { tasks } from "@/lib/data"
+import { getTasks } from "@/services/tasks"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 import { getProjects } from "@/services/projects";
-import type { Project } from "@/lib/types";
+import type { Project, Task } from "@/lib/types";
 
 const chartConfig = {
   completion: {
@@ -27,6 +27,7 @@ export default function ProjectCompletionChart() {
     useEffect(() => {
         async function fetchData() {
             const projects = await getProjects();
+            const tasks = await getTasks();
             const chartData = projects.map(project => {
                 const projectTasks = tasks.filter(task => task.projectId === project.id);
                 const completedTasks = projectTasks.filter(task => task.status === 'Done').length;

@@ -2,12 +2,15 @@ import type { Task, TaskStatus } from '@/lib/types';
 import KanbanTask from './kanban-task';
 import { Circle, CircleDashed, CheckCircle, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import CreateTaskDialog from '../create-task-dialog';
 
 type KanbanColumnProps = {
   status: TaskStatus;
   tasks: Task[];
   onDrop: (e: React.DragEvent<HTMLDivElement>, status: TaskStatus) => void;
   onDragStart: (e: React.DragEvent<HTMLDivElement>, taskId: string) => void;
+  onTaskCreated: () => void;
+  projectId: string;
 };
 
 const statusConfig = {
@@ -16,7 +19,7 @@ const statusConfig = {
     'Done': { icon: <CheckCircle className="h-4 w-4 text-green-500" />, color: 'bg-green-500' },
 }
 
-export default function KanbanColumn({ status, tasks, onDrop, onDragStart }: KanbanColumnProps) {
+export default function KanbanColumn({ status, tasks, onDrop, onDragStart, onTaskCreated, projectId }: KanbanColumnProps) {
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
@@ -35,9 +38,16 @@ export default function KanbanColumn({ status, tasks, onDrop, onDragStart }: Kan
                 <h2 className="font-semibold font-headline">{status}</h2>
                 <span className="text-sm text-muted-foreground bg-background rounded-full px-2 py-0.5">{tasks.length}</span>
             </div>
-            <Button variant="ghost" size="icon">
-                <Plus className="h-4 w-4 text-muted-foreground" />
-            </Button>
+            <CreateTaskDialog 
+              status={status} 
+              projectId={projectId} 
+              onTaskCreated={onTaskCreated}
+              trigger={
+                <Button variant="ghost" size="icon">
+                    <Plus className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              }
+            />
         </div>
       
       <div className="flex flex-col gap-4 overflow-y-auto flex-1">

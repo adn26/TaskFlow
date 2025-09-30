@@ -23,23 +23,27 @@ import {
 import ProjectCompletionChart from "@/components/app/dashboard/project-completion-chart";
 import TasksPerStatusChart from "@/components/app/dashboard/tasks-per-status-chart";
 import UpcomingDeadlines from "@/components/app/dashboard/upcoming-deadlines";
-import { tasks } from "@/lib/data";
+import { getTasks } from "@/services/tasks";
 import { getProjects } from "@/services/projects";
 import { useEffect, useState } from "react";
-import type { Project } from "@/lib/types";
+import type { Project, Task } from "@/lib/types";
 
 export default function DashboardPage() {
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
+
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.status === 'Done').length;
     const completionPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-    const [projects, setProjects] = useState<Project[]>([]);
 
     useEffect(() => {
-      async function fetchProjects() {
+      async function fetchData() {
         const projs = await getProjects();
         setProjects(projs);
+        const allTasks = await getTasks();
+        setTasks(allTasks);
       }
-      fetchProjects();
+      fetchData();
     }, []);
 
 

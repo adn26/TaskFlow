@@ -10,7 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { tasks, taskStatuses } from "@/lib/data"
+import { getTasks } from "@/services/tasks"
+import { taskStatuses } from "@/lib/data"
 import { ChartConfig, ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 
 
@@ -33,10 +34,20 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function TasksPerStatusChart() {
-    const data = taskStatuses.map(status => ({
-        status,
-        count: tasks.filter(task => task.status === status).length,
-    }));
+    const [data, setData] = React.useState<any[]>([]);
+
+    React.useEffect(() => {
+      async function fetchData() {
+        const tasks = await getTasks();
+        const chartData = taskStatuses.map(status => ({
+          status,
+          count: tasks.filter(task => task.status === status).length,
+        }));
+        setData(chartData);
+      }
+      fetchData();
+    }, []);
+    
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">

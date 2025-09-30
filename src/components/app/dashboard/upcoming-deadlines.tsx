@@ -7,14 +7,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { tasks, users } from "@/lib/data"
+import { users } from "@/lib/data"
+import { getTasks } from "@/services/tasks"
 import { differenceInDays, format } from "date-fns"
+import { useEffect, useState } from "react"
+import type { Task } from "@/lib/types"
 
 export default function UpcomingDeadlines() {
-  const upcomingTasks = tasks
-    .filter(task => task.dueDate && task.status !== 'Done' && differenceInDays(task.dueDate, new Date()) <= 7 && differenceInDays(task.dueDate, new Date()) >= 0)
-    .sort((a, b) => a.dueDate!.getTime() - b.dueDate!.getTime())
-    .slice(0, 5);
+  const [upcomingTasks, setUpcomingTasks] = useState<Task[]>([]);
+
+  useEffect(() => {
+    async function fetchUpcomingTasks() {
+      const tasks = await getTasks();
+      const upcoming = tasks
+        .filter(task => task.dueDate && task.status !== 'Done' && differenceInDays(new Date(task.dueDate), new Date()) <= 7 && differenceInDays(new Date(task.dueDate), new Date()) >= 0)
+        .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime())
+        .slice(0, 5);
+      setUpcomingTasks(upcoming);
+    }
+    fetchUpcomingTasks();
+  }, []);
+  
 
   return (
     <Table>
@@ -44,7 +57,7 @@ export default function UpcomingDeadlines() {
                     </div>
                 )}
               </TableCell>
-              <TableCell className="text-right">{task.dueDate && format(task.dueDate, "MMM d, yyyy")}</TableCell>
+              <TableCell className="text-right">{task.dueDate && format(new Date(task.dueDate), "MMM d, yyyy")}</TableCell>
             </TableRow>
           )
         })}
